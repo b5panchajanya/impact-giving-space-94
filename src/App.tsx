@@ -12,6 +12,9 @@ import NGOs from "./pages/NGOs";
 import NGODetail from "./pages/NGODetail";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Events from "./pages/Events";
 import ChatbotScreen from "./components/ChatbotScreen";
 import { Button } from "./components/ui/button";
 
@@ -32,6 +35,9 @@ const App = () => {
               <Route path="/ngos" element={<NGOs />} />
               <Route path="/ngo/:id" element={<NGODetail />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/events" element={<Events />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -3,11 +3,13 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, User, Heart, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
   const location = useLocation();
+  const { user, profile, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,8 +27,7 @@ const Navbar = () => {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "NGOs", path: "/ngos" },
-    { name: "Donate", path: "/donate" },
-    { name: "About", path: "/about" },
+    { name: "Events", path: "/events" },
   ];
 
   const isActive = (path: string) => {
@@ -76,14 +77,30 @@ const Navbar = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <Link to="/login" className="btn-outline py-1.5 px-3 text-sm flex items-center gap-2">
-                <LogIn size={16} />
-                Log In
-              </Link>
-              <Link to="/dashboard" className="btn-primary py-1.5 px-3 text-sm flex items-center gap-2">
-                <User size={16} />
-                Dashboard
-              </Link>
+              {user ? (
+                <>
+                  <Link to="/dashboard" className="btn-primary py-1.5 px-3 text-sm flex items-center gap-2">
+                    <User size={16} />
+                    Dashboard
+                  </Link>
+                  <button 
+                    onClick={() => signOut()} 
+                    className="btn-outline py-1.5 px-3 text-sm"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="btn-outline py-1.5 px-3 text-sm flex items-center gap-2">
+                    <LogIn size={16} />
+                    Log In
+                  </Link>
+                  <Link to="/signup" className="btn-primary py-1.5 px-3 text-sm">
+                    Register
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 
@@ -121,12 +138,28 @@ const Navbar = () => {
               ))}
             </div>
             <div className="flex flex-col gap-3 mt-6">
-              <Link to="/login" className="btn-outline py-2 px-3 text-center text-sm">
-                Log In
-              </Link>
-              <Link to="/dashboard" className="btn-primary py-2 px-3 text-center text-sm">
-                Dashboard
-              </Link>
+              {user ? (
+                <>
+                  <Link to="/dashboard" className="btn-primary py-2 px-3 text-center text-sm">
+                    Dashboard
+                  </Link>
+                  <button 
+                    onClick={() => signOut()}
+                    className="btn-outline py-2 px-3 text-center text-sm"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="btn-outline py-2 px-3 text-center text-sm">
+                    Log In
+                  </Link>
+                  <Link to="/signup" className="btn-primary py-2 px-3 text-center text-sm">
+                    Register
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}

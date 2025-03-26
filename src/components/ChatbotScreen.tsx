@@ -1,209 +1,236 @@
 
 import React, { useState } from 'react';
+import { X, Send, Bot, UserCircle } from 'lucide-react';
 import Spline from '@splinetool/react-spline';
-import { X, MessageCircle, Send, Navigation, DollarSign, Users, Award, HelpCircle, Bell, Heart } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+
+interface ChatMessage {
+  id: string;
+  text: string;
+  sender: 'user' | 'bot';
+  timestamp: Date;
+}
 
 interface ChatbotScreenProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const ChatbotScreen = ({ isOpen, onClose }: ChatbotScreenProps) => {
-  const [messages, setMessages] = useState<{ text: string; isUser: boolean }[]>([
-    { text: "Hello! I'm your Impact Assistant. How can I help you today?", isUser: false }
+const ChatbotScreen: React.FC<ChatbotScreenProps> = ({ isOpen, onClose }) => {
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      id: '1',
+      text: 'Hello! I\'m ImpactGive Assistant. How can I help you today?',
+      sender: 'bot',
+      timestamp: new Date(),
+    },
   ]);
-  const [inputValue, setInputValue] = useState('');
-  const [isSplineLoaded, setIsSplineLoaded] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [inputText, setInputText] = useState('');
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
-  const chatbotOptions = [
-    {
-      id: 1,
-      title: "Navigation Support",
-      description: "Guide users to NGOs, donations, events, and profiles.",
-      icon: <Navigation className="h-5 w-5 text-primary" />
-    },
-    {
-      id: 2,
-      title: "Donation Assistance",
-      description: "Explain options, process payments, track donations.",
-      icon: <DollarSign className="h-5 w-5 text-primary" />
-    },
-    {
-      id: 3,
-      title: "Volunteer Help",
-      description: "Find events, track hours, earn badges & certificates.",
-      icon: <Users className="h-5 w-5 text-primary" />
-    },
-    {
-      id: 4,
-      title: "NGO Support",
-      description: "Manage events, volunteers, donors, and certificates.",
-      icon: <Heart className="h-5 w-5 text-primary" />
-    },
-    {
-      id: 5,
-      title: "Gamification",
-      description: "Show badges, points, and leaderboard rankings.",
-      icon: <Award className="h-5 w-5 text-primary" />
-    },
-    {
-      id: 6,
-      title: "User Support",
-      description: "Answer FAQs, troubleshoot login/payments, ensure security.",
-      icon: <HelpCircle className="h-5 w-5 text-primary" />
-    },
-    {
-      id: 7,
-      title: "Real-Time Updates",
-      description: "Notify users about events, donations, and reminders.",
-      icon: <Bell className="h-5 w-5 text-primary" />
-    },
-    {
-      id: 8,
-      title: "Engaging Responses",
-      description: "Personalized, concise, and action-driven chats.",
-      icon: <MessageCircle className="h-5 w-5 text-primary" />
-    }
-  ];
+  const handleSend = () => {
+    if (inputText.trim() === '') return;
 
-  const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
-    
-    // Add user message
-    setMessages([...messages, { text: inputValue, isUser: true }]);
-    
-    // Clear input
-    setInputValue('');
-    
-    // Simulate bot response (in a real app, this would call an API)
+    const newUserMessage: ChatMessage = {
+      id: Date.now().toString(),
+      text: inputText,
+      sender: 'user',
+      timestamp: new Date(),
+    };
+
+    setMessages([...messages, newUserMessage]);
+    setInputText('');
+
+    // Simulate bot response
     setTimeout(() => {
-      setMessages(prev => [
-        ...prev, 
-        { 
-          text: "Thank you for your message! I'm processing your request and will get back to you shortly.", 
-          isUser: false 
-        }
-      ]);
+      const botResponse: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        text: getBotResponse(inputText),
+        sender: 'bot',
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, botResponse]);
     }, 1000);
   };
 
-  const handleOptionSelect = (optionId: number) => {
-    setSelectedOption(optionId);
-    const option = chatbotOptions.find(opt => opt.id === optionId);
-    if (option) {
-      // Add user selection as a message
-      setMessages([
-        ...messages, 
-        { text: `I'd like help with: ${option.title}`, isUser: true }
-      ]);
-      
-      // Simulate bot response based on selection
-      setTimeout(() => {
-        setMessages(prev => [
-          ...prev, 
-          { 
-            text: `I'd be happy to help with ${option.title.toLowerCase()}. ${option.description} What specific information are you looking for?`, 
-            isUser: false 
-          }
-        ]);
-      }, 1000);
+  const handleOptionSelect = (option: string) => {
+    setSelectedOption(option);
+    const newUserMessage: ChatMessage = {
+      id: Date.now().toString(),
+      text: option,
+      sender: 'user',
+      timestamp: new Date(),
+    };
+
+    setMessages([...messages, newUserMessage]);
+
+    // Simulate bot response
+    setTimeout(() => {
+      const botResponse: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        text: getOptionResponse(option),
+        sender: 'bot',
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, botResponse]);
+    }, 1000);
+  };
+
+  const getBotResponse = (message: string) => {
+    const lowerCaseMessage = message.toLowerCase();
+    
+    if (lowerCaseMessage.includes('hello') || lowerCaseMessage.includes('hi')) {
+      return 'Hello! How can I assist you today?';
+    } else if (lowerCaseMessage.includes('donate')) {
+      return 'You can donate to any of our verified NGOs by visiting their profile page and clicking the "Donate" button. Would you like me to show you some featured NGOs?';
+    } else if (lowerCaseMessage.includes('volunteer')) {
+      return 'Great! To volunteer, you can browse our events page and register for events that interest you. Would you like to see the upcoming volunteer opportunities?';
+    } else if (lowerCaseMessage.includes('ngo')) {
+      return 'We have many verified NGOs on our platform working across different causes. You can explore them on our NGOs page. Would you like me to recommend some based on your interests?';
+    } else {
+      return 'I\'m here to help! You can ask me about donations, volunteering, NGOs, events, or your account information.';
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const getOptionResponse = (option: string) => {
+    switch (option) {
+      case 'Navigation Support':
+        return 'I can help you navigate to different sections of our platform. Would you like to explore NGOs, ongoing events, or donation options?';
+      case 'Donation Assistance':
+        return 'I can guide you through the donation process. You can make monetary donations via secure payment gateways or contribute in-kind items. Would you like to donate to a specific NGO?';
+      case 'Volunteer Help':
+        return 'Looking to volunteer? I can help you find events based on your interests, track your volunteer hours, and earn certificates. What causes are you passionate about?';
+      case 'NGO Support':
+        return 'For NGO representatives, I can assist with event management, volunteer coordination, and donor communications. What aspect of NGO management do you need help with?';
+      case 'Gamification':
+        return 'Our platform rewards your contributions with badges and points! Would you like to check your current achievements or learn how to earn more points?';
+      case 'User Support':
+        return 'Need help with your account? I can assist with login issues, payment troubleshooting, and security concerns. What specific support do you need?';
+      case 'Real-Time Updates':
+        return 'I can provide updates on your registered events, donation status, and platform notifications. Would you like me to check any specific updates for you?';
+      default:
+        return 'How else can I assist you today?';
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleSendMessage();
+      handleSend();
     }
   };
 
   if (!isOpen) return null;
 
+  const chatOptions = [
+    'Navigation Support',
+    'Donation Assistance',
+    'Volunteer Help',
+    'NGO Support',
+    'Gamification',
+    'User Support',
+    'Real-Time Updates',
+  ];
+
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg w-full max-w-4xl h-[80vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden flex flex-col h-[80vh]">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <MessageCircle className="h-5 w-5 text-primary" />
-            Impact Assistant
-          </h2>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X className="h-5 w-5" />
-          </Button>
+        <div className="p-4 border-b flex justify-between items-center bg-primary text-white">
+          <div className="flex items-center gap-2">
+            <Bot size={20} />
+            <h2 className="font-semibold">ImpactGive Assistant</h2>
+          </div>
+          <button 
+            onClick={onClose}
+            className="text-white hover:bg-primary-dark rounded-full p-1"
+          >
+            <X size={20} />
+          </button>
         </div>
-        
-        {/* Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 flex-1 overflow-hidden">
-          {/* 3D Model Area */}
-          <div className="relative h-60 md:h-full bg-gray-100 dark:bg-gray-800">
-            {!isSplineLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-              </div>
-            )}
+
+        <div className="flex flex-col md:flex-row h-full">
+          {/* Spline 3D Model Section */}
+          <div className="h-64 md:h-auto md:w-1/3 bg-gray-100 dark:bg-gray-800 relative overflow-hidden">
             <Spline 
               scene="https://prod.spline.design/llGL96WSfPssVD22/scene.splinecode"
-              onLoad={() => setIsSplineLoaded(true)}
               className="w-full h-full"
             />
           </div>
-          
-          {/* Chat Area */}
-          <div className="flex flex-col h-full">
+
+          {/* Chat Section */}
+          <div className="flex-1 flex flex-col">
+            {/* Messages */}
             <div className="flex-1 p-4 overflow-y-auto">
-              {messages.map((message, index) => (
-                <div 
-                  key={index} 
-                  className={`mb-4 flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`mb-4 flex ${
+                    message.sender === 'user' ? 'justify-end' : 'justify-start'
+                  }`}
                 >
-                  <div 
-                    className={`max-w-[75%] rounded-lg p-3 ${
-                      message.isUser 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'bg-secondary text-secondary-foreground'
+                  <div
+                    className={`max-w-[80%] p-3 rounded-lg ${
+                      message.sender === 'user'
+                        ? 'bg-primary text-white rounded-tr-none'
+                        : 'bg-gray-100 dark:bg-gray-800 text-foreground rounded-tl-none'
                     }`}
                   >
-                    {message.text}
+                    <div className="flex items-start gap-2">
+                      {message.sender === 'bot' && (
+                        <Bot size={18} className="mt-1 text-primary" />
+                      )}
+                      <div>
+                        <p className="text-sm">{message.text}</p>
+                        <span className="text-xs opacity-70 mt-1 block">
+                          {message.timestamp.toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                      </div>
+                      {message.sender === 'user' && (
+                        <UserCircle size={18} className="mt-1 text-white" />
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
-            
-            {/* Option Buttons */}
-            {messages.length === 1 && (
-              <div className="p-4 border-t grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {chatbotOptions.map((option) => (
-                  <Button
-                    key={option.id}
-                    variant="outline"
-                    className="flex items-center gap-2 justify-start h-auto py-2"
-                    onClick={() => handleOptionSelect(option.id)}
-                  >
-                    {option.icon}
-                    <div className="text-left">
-                      <div className="font-semibold">{option.title}</div>
-                      <div className="text-xs text-muted-foreground truncate">{option.description}</div>
-                    </div>
-                  </Button>
-                ))}
+
+            {/* Quick options if no option selected yet */}
+            {messages.length <= 2 && !selectedOption && (
+              <div className="p-4 border-t">
+                <p className="text-sm text-muted-foreground mb-2">How can I help you today?</p>
+                <div className="flex flex-wrap gap-2">
+                  {chatOptions.map((option) => (
+                    <button
+                      key={option}
+                      onClick={() => handleOptionSelect(option)}
+                      className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full text-xs transition-colors"
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
-            
-            {/* Input Area */}
-            <div className="p-4 border-t flex gap-2">
-              <Input 
-                placeholder="Type your message..." 
-                value={inputValue} 
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="flex-1"
+
+            {/* Input area */}
+            <div className="p-4 border-t flex items-center gap-2">
+              <input
+                type="text"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Type your message..."
+                className="flex-1 bg-gray-100 dark:bg-gray-800 border-none focus:outline-none focus:ring-1 focus:ring-primary rounded-full px-4 py-2 text-sm"
               />
-              <Button onClick={handleSendMessage}>
-                <Send className="h-4 w-4" />
-              </Button>
+              <button
+                onClick={handleSend}
+                disabled={!inputText.trim()}
+                className="bg-primary hover:bg-primary/90 text-white rounded-full p-2 flex items-center justify-center disabled:opacity-50"
+              >
+                <Send size={18} />
+              </button>
             </div>
           </div>
         </div>
