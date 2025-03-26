@@ -4,7 +4,6 @@ import Spline from '@splinetool/react-spline';
 import { X, MessageCircle, Send, Navigation, DollarSign, Users, Award, HelpCircle, Bell, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 
 interface ChatbotScreenProps {
   isOpen: boolean;

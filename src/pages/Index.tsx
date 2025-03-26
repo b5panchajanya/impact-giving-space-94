@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { Heart, Users, ArrowRight, PieChart, Award, Globe } from "lucide-react";
@@ -7,6 +8,7 @@ import { CustomButton } from "@/components/CustomButton";
 import { CustomBadge } from "@/components/CustomBadge";
 import NGOCard from "@/components/NGOCard";
 import SplineButton from "@/components/SplineButton";
+import SplineBackground from "@/components/SplineBackground";
 
 // Mock data for NGOs
 const featuredNGOs = [
@@ -56,6 +58,11 @@ const Index = () => {
       <section className="pt-32 pb-16 md:pt-40 md:pb-24 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-radial from-primary/5 to-transparent" />
         <div className="dot-pattern absolute inset-0 opacity-30" />
+        
+        {/* Spline Background */}
+        <div className="absolute inset-0 z-0 opacity-70">
+          <SplineBackground scene="https://prod.spline.design/QDi9WAXfBoyqHaOK/scene.splinecode" />
+        </div>
         
         <div className="container-custom relative z-10">
           <div className="max-w-3xl mx-auto text-center">
