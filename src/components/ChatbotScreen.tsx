@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
 import Spline from '@splinetool/react-spline';
-import { X, MessageCircle, Send } from 'lucide-react';
+import { X, MessageCircle, Send, Navigation, DollarSign, Users, Award, HelpCircle, Bell, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 
 interface ChatbotScreenProps {
   isOpen: boolean;
@@ -16,6 +17,58 @@ const ChatbotScreen = ({ isOpen, onClose }: ChatbotScreenProps) => {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isSplineLoaded, setIsSplineLoaded] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+
+  const chatbotOptions = [
+    {
+      id: 1,
+      title: "Navigation Support",
+      description: "Guide users to NGOs, donations, events, and profiles.",
+      icon: <Navigation className="h-5 w-5 text-primary" />
+    },
+    {
+      id: 2,
+      title: "Donation Assistance",
+      description: "Explain options, process payments, track donations.",
+      icon: <DollarSign className="h-5 w-5 text-primary" />
+    },
+    {
+      id: 3,
+      title: "Volunteer Help",
+      description: "Find events, track hours, earn badges & certificates.",
+      icon: <Users className="h-5 w-5 text-primary" />
+    },
+    {
+      id: 4,
+      title: "NGO Support",
+      description: "Manage events, volunteers, donors, and certificates.",
+      icon: <Heart className="h-5 w-5 text-primary" />
+    },
+    {
+      id: 5,
+      title: "Gamification",
+      description: "Show badges, points, and leaderboard rankings.",
+      icon: <Award className="h-5 w-5 text-primary" />
+    },
+    {
+      id: 6,
+      title: "User Support",
+      description: "Answer FAQs, troubleshoot login/payments, ensure security.",
+      icon: <HelpCircle className="h-5 w-5 text-primary" />
+    },
+    {
+      id: 7,
+      title: "Real-Time Updates",
+      description: "Notify users about events, donations, and reminders.",
+      icon: <Bell className="h-5 w-5 text-primary" />
+    },
+    {
+      id: 8,
+      title: "Engaging Responses",
+      description: "Personalized, concise, and action-driven chats.",
+      icon: <MessageCircle className="h-5 w-5 text-primary" />
+    }
+  ];
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
@@ -36,6 +89,29 @@ const ChatbotScreen = ({ isOpen, onClose }: ChatbotScreenProps) => {
         }
       ]);
     }, 1000);
+  };
+
+  const handleOptionSelect = (optionId: number) => {
+    setSelectedOption(optionId);
+    const option = chatbotOptions.find(opt => opt.id === optionId);
+    if (option) {
+      // Add user selection as a message
+      setMessages([
+        ...messages, 
+        { text: `I'd like help with: ${option.title}`, isUser: true }
+      ]);
+      
+      // Simulate bot response based on selection
+      setTimeout(() => {
+        setMessages(prev => [
+          ...prev, 
+          { 
+            text: `I'd be happy to help with ${option.title.toLowerCase()}. ${option.description} What specific information are you looking for?`, 
+            isUser: false 
+          }
+        ]);
+      }, 1000);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -70,7 +146,7 @@ const ChatbotScreen = ({ isOpen, onClose }: ChatbotScreenProps) => {
               </div>
             )}
             <Spline 
-              scene="https://prod.spline.design/gbtUQgKGjX8SWVgs/scene.splinecode"
+              scene="https://prod.spline.design/llGL96WSfPssVD22/scene.splinecode"
               onLoad={() => setIsSplineLoaded(true)}
               className="w-full h-full"
             />
@@ -97,6 +173,27 @@ const ChatbotScreen = ({ isOpen, onClose }: ChatbotScreenProps) => {
               ))}
             </div>
             
+            {/* Option Buttons */}
+            {messages.length === 1 && (
+              <div className="p-4 border-t grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {chatbotOptions.map((option) => (
+                  <Button
+                    key={option.id}
+                    variant="outline"
+                    className="flex items-center gap-2 justify-start h-auto py-2"
+                    onClick={() => handleOptionSelect(option.id)}
+                  >
+                    {option.icon}
+                    <div className="text-left">
+                      <div className="font-semibold">{option.title}</div>
+                      <div className="text-xs text-muted-foreground truncate">{option.description}</div>
+                    </div>
+                  </Button>
+                ))}
+              </div>
+            )}
+            
+            {/* Input Area */}
             <div className="p-4 border-t flex gap-2">
               <Input 
                 placeholder="Type your message..." 
