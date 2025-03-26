@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import supabase from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { getUserProfile } from '@/lib/api';
 
@@ -90,10 +90,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (authError) throw authError;
 
       if (authData.user) {
-        // Create user profile - ensure user_id is passed as a string
+        // Create user profile with user_id explicitly passed as a string
         const { error: profileError } = await supabase.from('users').insert([
           { 
-            user_id: authData.user.id,
+            user_id: authData.user.id,  // Explicitly use the UUID as a string
             email,
             ...userData
           }
