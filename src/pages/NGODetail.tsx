@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
@@ -30,6 +29,8 @@ import {
   CustomCardDescription,
   CustomCardContent,
 } from "@/components/CustomCard";
+
+import { Twitter, Facebook, Instagram } from "lucide-react";
 
 // Mock data for NGO details
 const ngoData = {

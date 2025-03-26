@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Heart, Users, ArrowRight, PieChart, Award, Globe } from "lucide-react";
@@ -7,6 +6,7 @@ import Footer from "@/components/layout/Footer";
 import { CustomButton } from "@/components/CustomButton";
 import { CustomBadge } from "@/components/CustomBadge";
 import NGOCard from "@/components/NGOCard";
+import SplineButton from "@/components/SplineButton";
 
 // Mock data for NGOs
 const featuredNGOs = [
@@ -80,13 +80,10 @@ const Index = () => {
                 </CustomButton>
               </Link>
               <Link to="/donate">
-                <CustomButton 
-                  variant="outline" 
-                  size="lg"
-                  leftIcon={<Heart size={16} />}
-                >
-                  Make a Donation
-                </CustomButton>
+                <SplineButton 
+                  buttonText="Make a Donation"
+                  className="bg-white text-primary border-primary border hover:bg-primary/10 px-4 py-2 text-sm font-medium"
+                />
               </Link>
             </div>
           </div>
@@ -174,14 +171,10 @@ const Index = () => {
                 </CustomButton>
               </Link>
               <Link to="/donate">
-                <CustomButton 
-                  variant="outline" 
-                  size="lg"
-                  className="border-white text-white hover:bg-white/10"
-                  leftIcon={<Heart size={16} />}
-                >
-                  Donate Now
-                </CustomButton>
+                <SplineButton 
+                  buttonText="Donate Now"
+                  className="bg-transparent text-white border-white border hover:bg-white/10 px-4 py-2 text-sm font-medium"
+                />
               </Link>
             </div>
           </div>
