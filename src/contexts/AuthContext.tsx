@@ -90,7 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (authError) throw authError;
 
       if (authData.user) {
-        // Create user profile
+        // Create user profile - ensure user_id is passed as a string
         const { error: profileError } = await supabase.from('users').insert([
           { 
             user_id: authData.user.id,
