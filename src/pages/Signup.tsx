@@ -26,9 +26,9 @@ const formSchema = z.object({
     .regex(/[0-9]/, "Password must contain at least one number"),
   confirmPassword: z.string(),
   role: z.enum(["NGO", "Volunteer", "Donor"]),
-  agreeTerms: z.literal(true, {
-    errorMap: () => ({ message: "You must agree to the terms and privacy policy" }),
-  }),
+  agreeTerms: z.boolean().refine(val => val === true, {
+    message: "You must agree to the terms and privacy policy",
+  })
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],

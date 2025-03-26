@@ -1,517 +1,383 @@
 
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+// Import necessary components
+import React from "react";
+import { useParams } from "react-router-dom";
 import { 
-  CalendarCheck, 
-  Users, 
-  MapPin, 
-  Clock, 
-  DollarSign, 
-  Heart, 
-  Share2, 
-  ArrowLeft, 
-  Info,
-  X,
-  ExternalLink,
-  ChevronRight
+  Calendar, Globe, Mail, Phone, MapPin, Heart, Share2, Users, 
+  Info, Clock, DollarSign, Award, ArrowRight
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { CustomButton } from "@/components/CustomButton";
-import { CustomBadge } from "@/components/CustomBadge";
-import { 
-  CustomCard, 
-  CustomCardHeader, 
-  CustomCardTitle, 
-  CustomCardDescription,
-  CustomCardContent,
-  CustomCardFooter
-} from "@/components/CustomCard";
+import { Button } from "@/components/ui/button";
 import DonationForm from "@/components/DonationForm";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
-// Mock NGO data
+// Mock data for NGO details
 const ngoData = {
   id: "1",
-  name: "Clean Ocean Foundation",
-  description: "Working to protect marine ecosystems and reduce ocean pollution through community-driven initiatives and advocacy across coastal regions worldwide.",
-  longDescription: "The Clean Ocean Foundation is dedicated to preserving our oceans and marine life through a combination of direct action, education, and policy advocacy. Founded in 2005 by a group of passionate marine biologists and environmental activists, we have grown into a leading organization in the fight against ocean pollution, plastic waste, and habitat destruction.\n\nOur initiatives include beach cleanup operations, marine ecosystem restoration projects, educational programs for schools and communities, and lobbying efforts to strengthen environmental protection laws. We work closely with local communities, businesses, and governments to create sustainable solutions that protect our oceans while supporting the livelihoods of those who depend on them.",
-  mission: "To protect and restore the health of the world's oceans through direct action, education, and advocacy.",
-  vision: "A world where oceans are clean, healthy, and teeming with diverse marine life for generations to come.",
-  imageSrc: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=1974&auto=format&fit=crop",
-  logoSrc: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=1974&auto=format&fit=crop",
-  categories: ["Environment", "Conservation", "Education"],
-  location: "Global, headquarters in San Diego, CA",
-  founded: "2005",
-  totalDonors: 1243,
-  upcomingEvents: 3,
-  website: "https://www.cleanoceanfoundation.org",
-  contactEmail: "info@cleanoceanfoundation.org",
-  contactPhone: "+1 (800) 555-OCEAN",
-  socialMedia: {
-    twitter: "https://twitter.com/cleanoceanfdn",
-    facebook: "https://facebook.com/cleanoceanfoundation",
-    instagram: "https://instagram.com/cleanoceanfdn"
-  },
-  impactStats: [
-    { label: "Ocean Cleanup Operations", value: "500+" },
-    { label: "Marine Animals Saved", value: "10,000+" },
-    { label: "Volunteers Engaged", value: "25,000+" },
-    { label: "Educational Programs", value: "750+" }
-  ],
-  ongoingProjects: [
+  name: "Global Health Initiative",
+  tagline: "Healthcare for All",
+  description: "A non-profit organization dedicated to providing quality healthcare services to underprivileged communities around the world. We focus on preventive care, education, and sustainable health solutions.",
+  logoUrl: "https://placehold.co/200x200?text=GHI",
+  coverImage: "https://images.unsplash.com/photo-1469571486292-b53601022cba?q=80&w=2070&auto=format&fit=crop",
+  website: "www.globalhealthinitiative.org",
+  email: "info@globalhealthinitiative.org",
+  phone: "+1 (555) 123-4567",
+  location: "New York, USA",
+  yearFounded: 2005,
+  totalVolunteers: 1250,
+  totalEvents: 75,
+  totalDonations: "$2.3M",
+  impactMetrics: [
     {
-      id: "p1",
-      title: "Pacific Garbage Patch Cleanup",
-      description: "A multi-year initiative to remove plastic waste from the Great Pacific Garbage Patch using innovative collection technologies.",
-      status: "Active",
-      progress: 65,
-      fundingGoal: 500000,
-      fundingReceived: 325000,
-      impactDetails: "Removed over 200 tons of plastic waste from the ocean, preventing harm to thousands of marine animals.",
-      image: "https://images.unsplash.com/photo-1621451537084-482c73073a0f?q=80&w=1974&auto=format&fit=crop"
+      title: "Lives Impacted",
+      value: "35,000+"
     },
     {
-      id: "p2",
-      title: "Coral Reef Restoration",
-      description: "Restoring damaged coral reefs through cultivation and transplantation of coral fragments, focusing on areas affected by bleaching events.",
-      status: "Active",
-      progress: 40,
-      fundingGoal: 300000,
-      fundingReceived: 120000,
-      impactDetails: "Successfully transplanted over 5,000 coral fragments, with a 75% survival rate, revitalizing reef ecosystems.",
-      image: "https://images.unsplash.com/photo-1546026423-cc4642628d2b?q=80&w=2070&auto=format&fit=crop"
+      title: "Health Camps",
+      value: "230"
     },
     {
-      id: "p3",
-      title: "Coastal Community Education",
-      description: "Educational programs for coastal communities on sustainable fishing practices, waste management, and conservation.",
-      status: "Active",
-      progress: 80,
-      fundingGoal: 150000,
-      fundingReceived: 120000,
-      impactDetails: "Trained over 10,000 community members, resulting in a 40% reduction in local marine pollution.",
-      image: "https://images.unsplash.com/photo-1544427920-c49ccfb85579?q=80&w=2071&auto=format&fit=crop"
+      title: "Countries",
+      value: "15"
     }
   ],
-  pastProjects: [
+  upcomingEvents: [
     {
-      id: "pp1",
-      title: "Mediterranean Plastic Survey",
-      description: "Comprehensive study of plastic pollution levels across the Mediterranean Sea, identifying major sources and hotspots.",
-      completionDate: "2022",
-      outcomes: "Published findings in leading environmental journals, informing policy decisions in 5 Mediterranean countries.",
-      image: "https://images.unsplash.com/photo-1596753316268-243a7f86da95?q=80&w=2070&auto=format&fit=crop"
+      id: "e1",
+      title: "Health Camp in Delhi",
+      date: "2023-08-15",
+      location: "Delhi, India",
+      description: "Free health checkups and distribution of medicines.",
+      imageUrl: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2070&auto=format&fit=crop"
     },
     {
-      id: "pp2",
-      title: "Seabird Rehabilitation Center",
-      description: "Establishment of a rehabilitation center for seabirds affected by oil spills and marine pollution.",
-      completionDate: "2021",
-      outcomes: "Treated and released over 500 seabirds, with an 85% survival rate.",
-      image: "https://images.unsplash.com/photo-1632935190508-c95c7b13ba86?q=80&w=1973&auto=format&fit=crop"
+      id: "e2",
+      title: "Medical Workshop",
+      date: "2023-09-05",
+      location: "Chicago, USA",
+      description: "Training community health workers on basic healthcare.",
+      imageUrl: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?q=80&w=2070&auto=format&fit=crop"
+    }
+  ],
+  pastEvents: [
+    {
+      id: "e3",
+      title: "Vaccination Drive",
+      date: "2023-06-10",
+      location: "Nairobi, Kenya",
+      description: "Vaccinated over 5,000 children against polio.",
+      imageUrl: "https://images.unsplash.com/photo-1613843596852-15cec5576d55?q=80&w=2067&auto=format&fit=crop"
+    },
+    {
+      id: "e4",
+      title: "Awareness Campaign",
+      date: "2023-05-22",
+      location: "Mumbai, India",
+      description: "Raised awareness about COVID-19 preventive measures.",
+      imageUrl: "https://images.unsplash.com/photo-1603202662744-5e6c8c3e9414?q=80&w=2069&auto=format&fit=crop"
+    }
+  ],
+  testimonials: [
+    {
+      id: "t1",
+      quote: "The work that Global Health Initiative does is truly remarkable. They're changing lives every day.",
+      author: "Dr. Jane Smith",
+      role: "Public Health Specialist"
+    },
+    {
+      id: "t2",
+      quote: "I've volunteered with GHI for 3 years now, and I've seen firsthand the impact they make in communities.",
+      author: "Mark Johnson",
+      role: "Volunteer"
     }
   ]
 };
 
 const NGODetail = () => {
-  const [activeTab, setActiveTab] = useState<"about" | "projects" | "impact">("about");
-  const [isDonateModalOpen, setIsDonateModalOpen] = useState(false);
+  const { id } = useParams();
+  const { toast } = useToast();
   
-  const getStatusClass = (status: string) => {
-    switch (status) {
-      case "Active":
-        return "primary";
-      case "Completed":
-        return "secondary";
-      case "On Hold":
-        return "outline";
-      default:
-        return "primary";
-    }
+  // Simplified example - in a real app, fetch NGO data based on ID
+  const ngo = ngoData;
+
+  const handleVolunteerRegistration = () => {
+    // In a real app, this would register the user as a volunteer
+    toast({
+      title: "Registration Successful!",
+      description: "You have been registered as a volunteer for Global Health Initiative.",
+      duration: 5000,
+    });
+  };
+
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
   };
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      {/* Hero Section */}
-      <section className="relative">
-        <div className="h-64 md:h-80 bg-gray-200 relative overflow-hidden">
-          <img 
-            src={ngoData.imageSrc} 
-            alt={ngoData.name} 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-        </div>
-        
-        <div className="container-custom relative -mt-24 mb-10">
-          <div className="flex flex-col md:flex-row items-start gap-6">
-            {/* NGO Logo */}
-            <div className="w-32 h-32 rounded-xl overflow-hidden border-4 border-white bg-white shadow-md">
+      {/* Cover Image */}
+      <div className="w-full h-64 md:h-80 lg:h-96 relative mt-16">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70" />
+        <img 
+          src={ngo.coverImage} 
+          alt={ngo.name} 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute bottom-0 left-0 right-0 container-custom pb-8 pt-16">
+          <div className="flex items-center gap-4">
+            <div className="h-20 w-20 md:h-24 md:w-24 rounded-full overflow-hidden border-4 border-white bg-white">
               <img 
-                src={ngoData.logoSrc} 
-                alt={`${ngoData.name} logo`} 
+                src={ngo.logoUrl} 
+                alt={`${ngo.name} logo`} 
                 className="w-full h-full object-cover"
               />
             </div>
-            
-            {/* NGO Info */}
-            <div className="flex-1 pt-4 md:pt-12">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                  <h1 className="text-2xl md:text-4xl font-bold text-white md:text-gray-900 dark:text-white">{ngoData.name}</h1>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {ngoData.categories.map((category, index) => (
-                      <CustomBadge key={index} variant="primary">{category}</CustomBadge>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-white">{ngo.name}</h1>
+              <p className="text-white/80">{ngo.tagline}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Main Content */}
+      <div className="container-custom py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column */}
+          <div className="lg:col-span-2 space-y-8">
+            <Tabs defaultValue="about">
+              <TabsList className="mb-8">
+                <TabsTrigger value="about">About</TabsTrigger>
+                <TabsTrigger value="events">Events</TabsTrigger>
+                <TabsTrigger value="impact">Impact</TabsTrigger>
+                <TabsTrigger value="getInvolved">Get Involved</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="about" className="space-y-6">
+                <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border p-6">
+                  <h2 className="text-xl font-semibold mb-4">About the NGO</h2>
+                  <p className="text-muted-foreground">{ngo.description}</p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Globe size={18} className="text-primary" />
+                      <span className="text-sm">{ngo.website}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Mail size={18} className="text-primary" />
+                      <span className="text-sm">{ngo.email}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Phone size={18} className="text-primary" />
+                      <span className="text-sm">{ngo.phone}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <MapPin size={18} className="text-primary" />
+                      <span className="text-sm">{ngo.location}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border p-5 flex flex-col items-center justify-center text-center">
+                    <Info className="text-primary mb-2" size={20} />
+                    <p className="text-sm text-muted-foreground">Year Founded</p>
+                    <p className="text-xl font-semibold">{ngo.yearFounded}</p>
+                  </div>
+                  <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border p-5 flex flex-col items-center justify-center text-center">
+                    <Users className="text-primary mb-2" size={20} />
+                    <p className="text-sm text-muted-foreground">Total Volunteers</p>
+                    <p className="text-xl font-semibold">{ngo.totalVolunteers}</p>
+                  </div>
+                  <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border p-5 flex flex-col items-center justify-center text-center">
+                    <DollarSign className="text-primary mb-2" size={20} />
+                    <p className="text-sm text-muted-foreground">Total Donations</p>
+                    <p className="text-xl font-semibold">{ngo.totalDonations}</p>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="events" className="space-y-6">
+                <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border p-6">
+                  <h2 className="text-xl font-semibold mb-6">Upcoming Events</h2>
+                  <div className="space-y-6">
+                    {ngo.upcomingEvents.map(event => (
+                      <div key={event.id} className="flex flex-col md:flex-row gap-4 border-b pb-6 last:border-0 last:pb-0">
+                        <div className="w-full md:w-1/3 h-48 rounded-lg overflow-hidden">
+                          <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-medium mb-2">{event.title}</h3>
+                          <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                            <Calendar size={16} />
+                            <span className="text-sm">{formatDate(event.date)}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-muted-foreground mb-3">
+                            <MapPin size={16} />
+                            <span className="text-sm">{event.location}</span>
+                          </div>
+                          <p className="text-muted-foreground mb-4">{event.description}</p>
+                          <Button size="sm">Register as Volunteer</Button>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
                 
-                <div className="flex flex-wrap gap-3">
-                  <CustomButton
-                    variant="primary"
-                    leftIcon={<Heart size={16} />}
-                    onClick={() => setIsDonateModalOpen(true)}
-                  >
-                    Donate Now
-                  </CustomButton>
-                  <CustomButton
-                    variant="outline"
-                    leftIcon={<Share2 size={16} />}
-                    onClick={() => console.log("Share")}
-                  >
-                    Share
-                  </CustomButton>
-                  <Link to="/ngos">
-                    <CustomButton
-                      variant="secondary"
-                      leftIcon={<ArrowLeft size={16} />}
-                    >
-                      Back
-                    </CustomButton>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      {/* Content Section */}
-      <section className="py-6">
-        <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2">
-              {/* Tabs */}
-              <div className="mb-6 border-b">
-                <div className="flex overflow-x-auto">
-                  <button
-                    className={`px-4 py-2 font-medium text-sm whitespace-nowrap ${activeTab === "about" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"}`}
-                    onClick={() => setActiveTab("about")}
-                  >
-                    About
-                  </button>
-                  <button
-                    className={`px-4 py-2 font-medium text-sm whitespace-nowrap ${activeTab === "projects" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"}`}
-                    onClick={() => setActiveTab("projects")}
-                  >
-                    Projects
-                  </button>
-                  <button
-                    className={`px-4 py-2 font-medium text-sm whitespace-nowrap ${activeTab === "impact" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"}`}
-                    onClick={() => setActiveTab("impact")}
-                  >
-                    Impact
-                  </button>
-                </div>
-              </div>
-              
-              {/* Tab Content */}
-              <div className="mb-8">
-                {/* About Tab */}
-                {activeTab === "about" && (
+                <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border p-6">
+                  <h2 className="text-xl font-semibold mb-6">Past Events</h2>
                   <div className="space-y-6">
-                    <h2 className="text-2xl font-semibold">About {ngoData.name}</h2>
-                    <p className="text-muted-foreground whitespace-pre-line">{ngoData.longDescription}</p>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                      <div className="space-y-4">
-                        <h3 className="text-xl font-semibold">Our Mission</h3>
-                        <p className="text-muted-foreground">{ngoData.mission}</p>
-                      </div>
-                      <div className="space-y-4">
-                        <h3 className="text-xl font-semibold">Our Vision</h3>
-                        <p className="text-muted-foreground">{ngoData.vision}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Projects Tab */}
-                {activeTab === "projects" && (
-                  <div className="space-y-6">
-                    <h2 className="text-2xl font-semibold">Ongoing Projects</h2>
-                    <div className="space-y-6">
-                      {ngoData.ongoingProjects.map((project) => (
-                        <CustomCard key={project.id} className="overflow-hidden">
-                          <div className="grid grid-cols-1 md:grid-cols-3">
-                            <div className="h-48 md:h-full">
-                              <img 
-                                src={project.image} 
-                                alt={project.title} 
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                            <div className="md:col-span-2 p-6">
-                              <div className="flex justify-between items-start">
-                                <h3 className="text-xl font-semibold">{project.title}</h3>
-                                <CustomBadge variant={getStatusClass(project.status)}>
-                                  {project.status}
-                                </CustomBadge>
-                              </div>
-                              <p className="text-muted-foreground mt-2">{project.description}</p>
-                              
-                              <div className="mt-4">
-                                <div className="flex justify-between text-sm mb-1">
-                                  <span>Progress</span>
-                                  <span>{project.progress}%</span>
-                                </div>
-                                <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                  <div 
-                                    className="bg-primary h-2.5 rounded-full" 
-                                    style={{ width: `${project.progress}%` }}
-                                  ></div>
-                                </div>
-                              </div>
-                              
-                              <div className="mt-4 flex items-center justify-between">
-                                <div className="text-sm text-muted-foreground">
-                                  <strong>${(project.fundingReceived / 1000).toFixed(1)}K</strong> raised of ${(project.fundingGoal / 1000).toFixed(1)}K goal
-                                </div>
-                                <CustomButton
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => setIsDonateModalOpen(true)}
-                                >
-                                  Support
-                                </CustomButton>
-                              </div>
-                            </div>
-                          </div>
-                        </CustomCard>
-                      ))}
-                    </div>
-                    
-                    <h2 className="text-2xl font-semibold mt-10">Past Projects</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {ngoData.pastProjects.map((project) => (
-                        <CustomCard key={project.id} className="overflow-hidden">
-                          <div className="h-40">
-                            <img 
-                              src={project.image} 
-                              alt={project.title} 
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <CustomCardContent>
-                            <div className="flex justify-between items-start mb-2">
-                              <h3 className="text-lg font-semibold">{project.title}</h3>
-                              <span className="text-sm text-muted-foreground">{project.completionDate}</span>
-                            </div>
-                            <p className="text-muted-foreground text-sm">{project.description}</p>
-                            <div className="mt-4">
-                              <h4 className="text-sm font-medium">Outcomes:</h4>
-                              <p className="text-sm text-muted-foreground mt-1">{project.outcomes}</p>
-                            </div>
-                          </CustomCardContent>
-                        </CustomCard>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {/* Impact Tab */}
-                {activeTab === "impact" && (
-                  <div className="space-y-6">
-                    <h2 className="text-2xl font-semibold">Our Impact</h2>
-                    <p className="text-muted-foreground">
-                      At {ngoData.name}, we measure our success through the tangible impact we make on ocean 
-                      ecosystems and communities worldwide. Here's a snapshot of what we've achieved with the 
-                      support of our donors and volunteers.
-                    </p>
-                    
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                      {ngoData.impactStats.map((stat, index) => (
-                        <div 
-                          key={index} 
-                          className="text-center p-6 rounded-xl bg-white dark:bg-gray-800 shadow-subtle hover:shadow-elevation transition-all duration-300"
-                        >
-                          <h3 className="text-3xl font-bold text-primary mb-2">{stat.value}</h3>
-                          <p className="text-muted-foreground text-sm">{stat.label}</p>
+                    {ngo.pastEvents.map(event => (
+                      <div key={event.id} className="flex flex-col md:flex-row gap-4 border-b pb-6 last:border-0 last:pb-0">
+                        <div className="w-full md:w-1/3 h-48 rounded-lg overflow-hidden">
+                          <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover" />
                         </div>
-                      ))}
-                    </div>
-                    
-                    <div className="mt-10">
-                      <h3 className="text-xl font-semibold mb-4">Success Stories</h3>
-                      <div className="space-y-6">
-                        <CustomCard hover>
-                          <CustomCardContent>
-                            <h4 className="text-lg font-semibold">Caribbean Coral Restoration</h4>
-                            <p className="text-muted-foreground mt-2">
-                              Our three-year project in the Caribbean has successfully restored over 20 acres of coral reef,
-                              creating new habitats for thousands of marine species and improving coastal protection for 
-                              local communities.
-                            </p>
-                            <div className="mt-4 grid grid-cols-2 gap-4">
-                              <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                <p className="text-2xl font-bold text-primary">20+ acres</p>
-                                <p className="text-sm text-muted-foreground">Reef Restored</p>
-                              </div>
-                              <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                <p className="text-2xl font-bold text-primary">15,000+</p>
-                                <p className="text-sm text-muted-foreground">Marine Species Supported</p>
-                              </div>
-                            </div>
-                          </CustomCardContent>
-                        </CustomCard>
-                        
-                        <CustomCard hover>
-                          <CustomCardContent>
-                            <h4 className="text-lg font-semibold">Beach Cleanup Initiative</h4>
-                            <p className="text-muted-foreground mt-2">
-                              Our worldwide beach cleanup program has mobilized over 100,000 volunteers across 
-                              50 countries, removing more than 500 tons of plastic and debris from coastlines.
-                            </p>
-                            <div className="mt-4 grid grid-cols-2 gap-4">
-                              <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                <p className="text-2xl font-bold text-primary">500+ tons</p>
-                                <p className="text-sm text-muted-foreground">Waste Removed</p>
-                              </div>
-                              <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                <p className="text-2xl font-bold text-primary">1,000+</p>
-                                <p className="text-sm text-muted-foreground">Beaches Cleaned</p>
-                              </div>
-                            </div>
-                          </CustomCardContent>
-                        </CustomCard>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-medium mb-2">{event.title}</h3>
+                          <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                            <Calendar size={16} />
+                            <span className="text-sm">{formatDate(event.date)}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-muted-foreground mb-3">
+                            <MapPin size={16} />
+                            <span className="text-sm">{event.location}</span>
+                          </div>
+                          <p className="text-muted-foreground mb-4">{event.description}</p>
+                          <Button size="sm" variant="outline">See Details</Button>
+                        </div>
                       </div>
-                    </div>
+                    ))}
                   </div>
-                )}
-              </div>
-            </div>
-            
-            {/* Sidebar */}
-            <div>
-              <CustomCard glass>
-                <CustomCardHeader>
-                  <CustomCardTitle>Quick Information</CustomCardTitle>
-                </CustomCardHeader>
-                <CustomCardContent className="space-y-4">
-                  <div className="flex items-center">
-                    <MapPin size={18} className="text-primary mr-2" />
-                    <span>{ngoData.location}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Clock size={18} className="text-primary mr-2" />
-                    <span>Founded in {ngoData.founded}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <DollarSign size={18} className="text-primary mr-2" />
-                    <span>{ngoData.totalDonors} donors supporting</span>
-                  </div>
-                  <div className="flex items-center">
-                    <CalendarCheck size={18} className="text-primary mr-2" />
-                    <span>{ngoData.upcomingEvents} upcoming events</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Users size={18} className="text-primary mr-2" />
-                    <span>25,000+ volunteers engaged</span>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="impact" className="space-y-6">
+                <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border p-6">
+                  <h2 className="text-xl font-semibold mb-6">Our Impact</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    {ngo.impactMetrics.map((metric, idx) => (
+                      <div key={idx} className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 text-center">
+                        <p className="text-3xl font-bold text-primary mb-2">{metric.value}</p>
+                        <p className="text-sm text-muted-foreground">{metric.title}</p>
+                      </div>
+                    ))}
                   </div>
                   
-                  <div className="border-t pt-4 mt-4">
-                    <h3 className="font-semibold mb-2">Contact Information</h3>
-                    <div className="space-y-2 text-sm">
-                      <p>Email: {ngoData.contactEmail}</p>
-                      <p>Phone: {ngoData.contactPhone}</p>
-                      <a 
-                        href={ngoData.website} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center text-primary hover:underline"
-                      >
-                        Visit Website <ExternalLink size={14} className="ml-1" />
-                      </a>
+                  <h3 className="text-lg font-medium mb-4">Testimonials</h3>
+                  <div className="space-y-6">
+                    {ngo.testimonials.map(testimonial => (
+                      <blockquote key={testimonial.id} className="border-l-4 border-primary pl-4 py-2">
+                        <p className="text-muted-foreground italic mb-2">"{testimonial.quote}"</p>
+                        <footer className="text-sm">
+                          <strong>{testimonial.author}</strong>, {testimonial.role}
+                        </footer>
+                      </blockquote>
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="getInvolved" className="space-y-6">
+                <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border p-6">
+                  <h2 className="text-xl font-semibold mb-4">Get Involved</h2>
+                  <p className="text-muted-foreground mb-6">
+                    There are many ways you can contribute to {ngo.name} and help us make a difference.
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div className="border rounded-lg p-6">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Heart className="text-red-500" size={20} />
+                        <h3 className="text-lg font-medium">Donate</h3>
+                      </div>
+                      <p className="text-muted-foreground mb-4">
+                        Your donations help us fund our programs and reach more people in need.
+                      </p>
+                      <Button>Make a Donation</Button>
+                    </div>
+                    
+                    <div className="border rounded-lg p-6">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Users className="text-blue-500" size={20} />
+                        <h3 className="text-lg font-medium">Volunteer</h3>
+                      </div>
+                      <p className="text-muted-foreground mb-4">
+                        Join our volunteer program and help us with our events and initiatives.
+                      </p>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button>Become a Volunteer</Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure you want to become a volunteer?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              By becoming a volunteer, you'll be part of our team working to make a difference. You'll receive notifications about upcoming events and opportunities.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleVolunteerRegistration}>
+                              Yes
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </div>
-                </CustomCardContent>
-                <CustomCardFooter>
-                  <CustomButton 
-                    variant="primary"
-                    fullWidth
-                    onClick={() => setIsDonateModalOpen(true)}
-                  >
-                    Support Our Mission
-                  </CustomButton>
-                </CustomCardFooter>
-              </CustomCard>
-              
-              <CustomCard glass className="mt-6">
-                <CustomCardHeader>
-                  <CustomCardTitle>Get Involved</CustomCardTitle>
-                </CustomCardHeader>
-                <CustomCardContent className="space-y-3">
-                  <Link to="/volunteer" className="flex items-center justify-between p-3 bg-secondary/20 rounded-lg hover:bg-secondary/30 transition">
-                    <div className="flex items-center">
-                      <Users size={18} className="text-primary mr-2" />
-                      <span>Become a Volunteer</span>
+                  
+                  <div className="border rounded-lg p-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Share2 className="text-green-500" size={20} />
+                      <h3 className="text-lg font-medium">Spread the Word</h3>
                     </div>
-                    <ChevronRight size={16} />
-                  </Link>
-                  <Link to="/events" className="flex items-center justify-between p-3 bg-secondary/20 rounded-lg hover:bg-secondary/30 transition">
-                    <div className="flex items-center">
-                      <CalendarCheck size={18} className="text-primary mr-2" />
-                      <span>Join an Event</span>
+                    <p className="text-muted-foreground mb-4">
+                      Help us reach more people by sharing our mission with your network.
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                      <Button variant="outline" size="sm">
+                        <Share2 size={14} className="mr-1" /> Share
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        <Mail size={14} className="mr-1" /> Email
+                      </Button>
                     </div>
-                    <ChevronRight size={16} />
-                  </Link>
-                  <button className="w-full flex items-center justify-between p-3 bg-secondary/20 rounded-lg hover:bg-secondary/30 transition">
-                    <div className="flex items-center">
-                      <Share2 size={18} className="text-primary mr-2" />
-                      <span>Spread the Word</span>
-                    </div>
-                    <ChevronRight size={16} />
-                  </button>
-                </CustomCardContent>
-              </CustomCard>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+          
+          {/* Right Column - Donation Form */}
+          <div>
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border overflow-hidden sticky top-24">
+              <div className="bg-primary text-primary-foreground p-4">
+                <h3 className="text-lg font-medium">Make a Donation</h3>
+                <p className="text-sm text-primary-foreground/80">Your contribution matters</p>
+              </div>
+              <div className="p-5">
+                <DonationForm />
+              </div>
             </div>
           </div>
         </div>
-      </section>
-      
-      {/* Donation Modal */}
-      {isDonateModalOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg max-w-lg w-full relative">
-            <button 
-              className="absolute right-4 top-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-              onClick={() => setIsDonateModalOpen(false)}
-            >
-              <X size={20} />
-            </button>
-            
-            <div className="p-6">
-              <h2 className="text-2xl font-bold mb-1">Donate to {ngoData.name}</h2>
-              <p className="text-muted-foreground mb-6">Your contribution helps us create a cleaner ocean for all.</p>
-              
-              <DonationForm ngoId={ngoData.id} ngoName={ngoData.name} />
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
       
       <Footer />
     </div>
