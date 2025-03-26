@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,18 +8,29 @@ import VolunteerDashboard from "@/components/dashboard/VolunteerDashboard";
 import DonorDashboard from "@/components/dashboard/DonorDashboard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
   const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
+  const { toast } = useToast();
 
   useEffect(() => {
     // Redirect to login if not authenticated and not loading
     if (!loading && !user) {
       navigate("/login");
     }
-  }, [user, loading, navigate]);
+
+    // Show toast message if profile is loaded but role not recognized
+    if (!loading && user && profile && !['NGO', 'Volunteer', 'Donor'].includes(profile.role)) {
+      toast({
+        variant: "destructive",
+        title: "Invalid user role",
+        description: "Your account role is not recognized. Please contact support."
+      });
+    }
+  }, [user, profile, loading, navigate, toast]);
 
   // Show loading state
   if (loading) {
@@ -46,6 +56,8 @@ const Dashboard = () => {
   // Render different dashboards based on user role
   const renderDashboardContent = () => {
     if (!profile) return null;
+
+    console.log("User role:", profile.role); // Debug log
 
     switch (profile.role) {
       case "NGO":

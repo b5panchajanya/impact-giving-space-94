@@ -1,5 +1,4 @@
-
-import supabase from './supabase';
+import { supabase } from '@/integrations/supabase/client';
 
 // User related functions
 export const getCurrentUser = async () => {
@@ -8,14 +7,31 @@ export const getCurrentUser = async () => {
 };
 
 export const getUserProfile = async (userId: string) => {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('user_id', userId)
-    .single();
-  
-  if (error) throw error;
-  return data;
+  try {
+    console.log('Fetching user profile for:', userId);
+    
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+    
+    if (error) {
+      console.error('Error fetching user profile:', error);
+      throw error;
+    }
+    
+    if (!data) {
+      console.error('No user profile found for ID:', userId);
+      return null;
+    }
+    
+    console.log('Retrieved user profile:', data);
+    return data;
+  } catch (error) {
+    console.error('Error in getUserProfile:', error);
+    throw error;
+  }
 };
 
 // NGO related functions

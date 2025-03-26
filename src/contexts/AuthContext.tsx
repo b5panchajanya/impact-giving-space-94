@@ -85,21 +85,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string, userData: Partial<UserProfile>) => {
     setLoading(true);
     try {
-      // Create auth user
+      // Step 1: Create auth user
       const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
       if (authError) throw authError;
 
       if (authData.user) {
-        // Create user profile with user_id explicitly passed as a string
-        const { error: profileError } = await supabase.from('users').insert([
-          { 
-            user_id: authData.user.id,  // Explicitly use the UUID as a string
-            email,
-            ...userData
-          }
-        ]);
+        // Step 2: Create user profile in the users table
+        // Ensure we include all required fields for the users table
+        const { error: profileError } = await supabase.from('users').insert({
+          user_id: authData.user.id,  // Explicitly use the UUID as a string
+          name: userData.name || 'User', // Default name if not provided
+          email: email,
+          password: '**********', // Store a placeholder - real password is managed by Auth
+          role: userData.role || 'Volunteer', // Default role if not provided
+          phone: userData.phone || null
+        });
         
-        if (profileError) throw profileError;
+        if (profileError) {
+          console.error('Error creating user profile:', profileError);
+          throw profileError;
+        }
       }
     } catch (error) {
       console.error('Error signing up:', error);
